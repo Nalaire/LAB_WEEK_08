@@ -16,7 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
-class NotificationService : Service() {
+class SecondNotificationService : Service() {
     //In order to make the required notification, a service is required
     //to do the job for us in the foreground process
     //Create the notification builder that'll be called later on
@@ -41,7 +41,7 @@ class NotificationService : Service() {
         //while on the other hand, 'Handler' enqueues the process to HandlerThread to be executed.
 //Here, we're instantiating a new HandlerThread called "SecondThread"
 //then we pass that HandlerThread into the main Handler called serviceHandler
-        val handlerThread = HandlerThread("SecondThread")
+        val handlerThread = HandlerThread("ThirdThread")
             .apply { start() }
         serviceHandler = Handler(handlerThread.looper)
     }
@@ -75,9 +75,9 @@ class NotificationService : Service() {
     private fun getPendingIntent(): PendingIntent {
         //In order to create a pending Intent, a Flag is needed
         //A flag basically controls whether the Intent can be modified or not later on
-//Unfortunately Flag exists only for API 31 and above,
-//therefore we need to check for the SDK version of the device first
-//"Build.VERSION_CODES.S" stands for 'S' which is the API 31 release name
+        //Unfortunately Flag exists only for API 31 and above,
+        //therefore we need to check for the SDK version of the device first
+        //"Build.VERSION_CODES.S" stands for 'S' which is the API 31 release name
         val flag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
             FLAG_IMMUTABLE else 0
         //Here, we're setting MainActivity into the pending Intent
@@ -95,14 +95,14 @@ class NotificationService : Service() {
     //A notification channel includes a couple of attributes:
     //channel id, channel name, and the channel priority
     private fun createNotificationChannel(): String =
-    //Unfortunately notification channel exists only for API 26 and above,
-    //therefore we need to check for the SDK version of the device.
+        //Unfortunately notification channel exists only for API 26 and above,
+        //therefore we need to check for the SDK version of the device.
         //"Build.VERSION_CODES.O" stands for 'Oreo' which is the API 26 release name
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             //Create the channel id
-            val channelId = "001"
+            val channelId = "002"
             //Create the channel name
-            val channelName = "001 Channel"
+            val channelName = "002 Channel"
             //Create the channel priority
             //There are 3 common types of priority:
             //IMPORTANCE_HIGH - makes a sound, vibrates, appears as heads-up notification
@@ -132,18 +132,18 @@ class NotificationService : Service() {
     String) =
         NotificationCompat.Builder(this, channelId)
             //Sets the title
-            .setContentTitle("Second worker process is done")
+            .setContentTitle("Third worker process is done")
             //Sets the content
             .setContentText("Check it out!")
             //Sets the notification icon
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-    //Sets the action/intent to be executed when the user clicks the notification
-    .setContentIntent(pendingIntent)
-    //Sets the ticker message (brief message on top of your device)
-    .setTicker("Second worker process is done, check it out!")
-    //setOnGoing() controls whether the notification is dismissible or not by the user
-    //If true, the notification is not dismissible and can only be closed by the app
-    .setOngoing(true)
+            //Sets the action/intent to be executed when the user clicks the notification
+            .setContentIntent(pendingIntent)
+            //Sets the ticker message (brief message on top of your device)
+            .setTicker("Third worker process is done, check it out!")
+            //setOnGoing() controls whether the notification is dismissible or not by the user
+            //If true, the notification is not dismissible and can only be closed by the app
+            .setOngoing(true)
 
     //This is a callback and part of a life cycle
     //This callback will be called when the service is started
@@ -161,7 +161,7 @@ class NotificationService : Service() {
         serviceHandler.post {
             //Sets up what happens after the notification is posted
             //Here, we're counting down from 10 to 0 in the notification
-            countDownFromTenToZero(notificationBuilder)
+            countDownFromTwelveToZero(notificationBuilder)
             //Here we're notifying the MainActivity that the service process is done
             //by returning the channel ID through LiveData
             notifyCompletion(Id)
@@ -174,13 +174,13 @@ class NotificationService : Service() {
         return returnValue
     }
     //A function to update the notification to display a count down from 10 to 0
-    private fun countDownFromTenToZero(notificationBuilder:
+    private fun countDownFromTwelveToZero(notificationBuilder:
                                        NotificationCompat.Builder) {
         //Gets the notification manager
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as
                 NotificationManager
         //Count down from 10 to 0
-        for (i in 10 downTo 0) {
+        for (i in 12 downTo 0) {
             Thread.sleep(1000L)
             //Updates the notification content text
             notificationBuilder.setContentText("$i seconds until last warning")
@@ -201,7 +201,7 @@ class NotificationService : Service() {
         }
     }
     companion object {
-        const val NOTIFICATION_ID = 0xCA7
+        const val NOTIFICATION_ID = 0xCA8
         const val EXTRA_ID = "Id"
 
         //this is a LiveData which is a data holder that automatically
